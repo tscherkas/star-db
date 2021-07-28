@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import Header from '../header';
 import RandomPlanet from '../random-planet';
-import TogglePlanet from '../toggle-planet';
-import ErrorIndicator from '../error-indicator';
-import PeoplePage from '../people-page';
+import ErrorBoundry from "../error-boundry";
+import SwapiService from '../../services/swapi-service';
+import DummySwapiService from '../../services/dummy-swapi-service';
+import { SwapiServiceProvider } from "../swapi-service-context";
+
+import { PeoplePage, PlanetsPage, StarshipsPage } from "../pages";
 
 import './app.css';
 
@@ -12,7 +15,7 @@ export default class App extends Component {
   state = {
     showRandomPlanet: true,
     selectedPerson: 11,
-    hasError: false
+    swapiService: new SwapiService()
   }
 
   constructor() {
@@ -27,44 +30,27 @@ export default class App extends Component {
     }
   }
 
-  componentDidCatch(error, errorInfo) {
+  onServiceChange = () => {
+    const Service = this.state.swapiService instanceof SwapiService ?
+      DummySwapiService : SwapiService;
+
     this.setState({
-      hasError: true
+      swapiService: new Service()
     });
   }
 
   render(){
-    const { showRandomPlanet, selectedPerson, hasError } = this.state;
-
-    if(hasError){
-      return <ErrorIndicator />
-    }
-
-    const randomPlanet = showRandomPlanet ? <RandomPlanet /> : null;
-/**
-
-
-<div className="row mb2">
-  <div className="col-lg-4">
-    <ItemList onItemSelected={ this.onPersonSelected }/>
-  </div>
-  <div className="col-lg-8 d-flex justify-content-center align-items-center">
-    <PersonDetails selectedPerson={ selectedPerson }/>
-  </div>
-</div>
-
-
-
-*/
-
     return (
       <div className="app container">
-        <Header />
-        { randomPlanet }
-        <TogglePlanet onClick={ this.onTogglePlanet }/>
-        <PeoplePage />
-        <PeoplePage />
-        <PeoplePage />
+        <ErrorBoundry>
+          <SwapiServiceProvider value={ this.state.swapiService }>
+            <Header onServiceChange={this.onServiceChange} />
+            <RandomPlanet />
+            <PeoplePage />
+            <PlanetsPage />
+            <StarshipsPage />
+          </SwapiServiceProvider>
+        </ErrorBoundry>
       </div>
     );
   }

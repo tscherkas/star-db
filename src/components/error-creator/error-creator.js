@@ -20,7 +20,6 @@ export default class ErrorCreator extends Component {
   }
 
   onErrorClick = (e) => {
-    console.log("I'm here!");
     this.setState({
       renderError: true
     });
