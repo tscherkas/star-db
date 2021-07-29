@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 
-const withChildRenderFunction = (Wrapped, renderFunction) => {
+const withChildRenderFunction = (renderFunction) => (Wrapped) => {
   return class extends Component {
     render() {
       return (
