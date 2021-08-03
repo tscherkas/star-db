@@ -1,5 +1,6 @@
 import React from "react";
 import ErrorCreator from "../error-creator";
+import PropTypes from "prop-types";
 
 import './item-list.css';
 
@@ -25,6 +26,12 @@ const ItemList = (props) => {
         <ErrorCreator />
       </div>
     );
+}
+
+ItemList.propTypes ={
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onItemSelected: PropTypes.func,
+  children: PropTypes.func.isRequired
 }
 
 

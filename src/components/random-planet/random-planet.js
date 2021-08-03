@@ -2,10 +2,18 @@ import React, { Component } from 'react';
 import SwapiService from '../../services/swapi-service';
 import Spinner from '../spinner';
 import ErrorIndicator from '../error-indicator';
+import PropTypes from "prop-types";
 
 import './random-planet.css'
 
 export default class RandomPlanet extends Component {
+  static defaultProps = {
+    interval: 2500
+  }
+
+  static propTypes = {
+    interval: PropTypes.number
+  }
 
   constructor() {
     super();
@@ -13,23 +21,32 @@ export default class RandomPlanet extends Component {
     this.onPlanetLoaded = (planet) => {
       this.setState({
         planet,
-        isLoading: false
+        isLoading: false,
+        isRequesting: false
       });
     }
 
     this.onError = (err) => {
       this.setState({
         isError: true,
-        isLoading: false
+        isLoading: false,
+        isRequesting: false
       });
     }
 
     this.updatePlanet = () => {
-      const id = Math.floor(Math.random()*25)+3;
-      this.swapiService
-        .getPlanet(id)
-        .then(this.onPlanetLoaded)
-        .catch(this.onError);
+      if(!this.state.isRequesting){
+
+        this.setState({
+          isRequesting: true
+        });
+
+        const id = Math.floor(Math.random()*25)+3;
+        this.swapiService
+          .getPlanet(id)
+          .then(this.onPlanetLoaded)
+          .catch(this.onError);
+        }
       }
   }
 
@@ -38,12 +55,14 @@ export default class RandomPlanet extends Component {
   state = {
     planet: {},
     isLoading: true,
-    isError: false
+    isError: false,
+    isRequesting: false
   };
 
   componentDidMount() {
+    const { interval } = this.props;
     this.updatePlanet();
-    this.interval =  setInterval(this.updatePlanet, 2500);
+    this.interval =  setInterval(this.updatePlanet, interval);
   }
 
   componentWillUnmount() {
@@ -69,6 +88,7 @@ export default class RandomPlanet extends Component {
     );
   }
 }
+
 
 const PlanetView = ({ planet }) => {
   const { id, name, population, rotationPeriod, diameter } = planet;
